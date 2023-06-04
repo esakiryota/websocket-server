@@ -8,7 +8,7 @@ const redis = new Redis({
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-    res.render('index', { title: 'Express', channelNumber: count });
+    res.render('index', { title: 'WebsocketServer'});
 });
 
 module.exports = router;
