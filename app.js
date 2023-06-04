@@ -42,24 +42,18 @@ app.use(function(err, req, res, next) {
 
 var Redis = require('ioredis');
 
-const redisClientPublisher = new Redis({
-  host: 'localhost', // Redisサーバーのホスト名
-  port: 6379, // Redisサーバーのポート番号
-});
+const redisClientPublisher = new Redis();
 
 const connections = new Set();
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8082 });
+const wss = new WebSocket.Server({ port: 8083 });
   
   wss.on('connection', (ws, req) => {
     const roomId = req.url;
 
-    const redisClientSubscriber = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
+    const redisClientSubscriber = new Redis();
 
     connections.add(ws);
 
