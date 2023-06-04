@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Message</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <script type="text/javascript">
+    console.log("送信ボタンを押して下さい");
+    var param = '<%= roomId %>';
+    var sock = new WebSocket(`ws://127.0.0.1:8082/${param}`);
+
+    sock.addEventListener('open',function(e){// 接続
+        console.log('Socket 接続成功');
+    });
+
+    sock.addEventListener('message',function(e){// サーバーからデータを受け取る
+        console.log(e.data);
+    });
+
+    document.addEventListener('DOMContentLoaded',function(e){
+        document.getElementById('sample').addEventListener('click',function(e){
+            console.log("send Hello!!");
+            sock.send('hello');// WebSocketでサーバーに文字列を送信
+        });
+    });
+</script>
+  <body>
+    <h1>Message</h1>
+    <p>Welcome to <%= roomId %></p>
+    <input type="button" id="sample" value="送信">
+  </body>
+</html>
