@@ -85,3 +85,64 @@ $ systemctl status my-service-name
 ```
 
 12. http://ip-address/ にアクセス。表示されていれば成功
+
+## https対応するまでの流れ
+1. 以下の記事を参考にdomainをサーバーと紐づける
+https://qiita.com/OPySPGcLYpJE0Tc/items/4a141a880351cf655de9
+
+2. 以下のコマンドを順番に実行する
+```
+$ sudo apt update
+$ sudo apt install certbot
+$ sudo apt-get update
+$ sudo apt-get install python3-certbot-nginx
+$ sudo certbot certonly --nginx
+```
+最後のコマンド時に聞かれる質問は全てYesでメールアドレス、紐づけられたdomainを入力
+
+3. WebsocketServer デプロイ方法(ubuntuサーバー)の6で作成したファイルを以下のように書き換え
+```
+upstream websocket-backend {
+    server localhost:3002;
+}
+
+server {
+    listen 80;
+    server_name example.com;  # ドメイン名を適切に設定
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name example.com;  # ドメイン名を適切に設定
+
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+
+    location / {
+        try_files $uri @proxy_to_app;
+    }
+
+    location @proxy_to_app {
+        proxy_pass http://websocket-backend;
+
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_redirect off;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $server_name;
+    }
+}
+```
+
+4. 変更が完了したら、Nginxを再起動
+```
+$ sudo systemctl restart nginx
+```
+
+5. "https://新しいドメイン/ "にアクセスして確認

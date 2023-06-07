@@ -42,13 +42,20 @@ app.use(function(err, req, res, next) {
 
 var Redis = require('ioredis');
 
+const https = require('https');
+
+const server = https.createServer({
+  cert: fs.readFileSync('/etc/letsencrypt/live/www.websocket-server.link/fullchain.pem'),
+  key: fs.readFileSync('/etc/letsencrypt/live/www.websocket-server.link/privkey.pem')
+}, app);
+
 const redisClientPublisher = new Redis();
 
 const connections = new Set();
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8083 });
+const wss = new WebSocket.Server(server);
   
   wss.on('connection', (ws, req) => {
     const roomId = req.url;
@@ -82,6 +89,10 @@ const wss = new WebSocket.Server({ port: 8083 });
       redisClientSubscriber.unsubscribe();
       redisClientSubscriber.quit();
     });
+  });
+
+  server.listen(8083, () => {
+    console.log('WebSocket server is running on port 8083 with SSL/TLS.');
   });
 
 
