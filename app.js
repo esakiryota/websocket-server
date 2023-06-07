@@ -56,7 +56,7 @@ const connections = new Set();
 
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server(server);
+const wss = new WebSocket.Server({server});
   
   wss.on('connection', (ws, req) => {
     const roomId = req.url;
