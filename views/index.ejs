@@ -6,7 +6,9 @@
   </head>
   <script type="text/javascript">
     console.log("送信ボタンを押して下さい");
-    var sock = new WebSocket('wss://www.websocket-server.link/');
+    var sock = new WebSocket('wss://www.websocket-server.link:8083/');
+
+    sock.onopen()
 
     sock.addEventListener('open',function(e){// 接続
         console.log('Socket 接続成功');
