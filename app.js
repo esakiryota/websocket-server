@@ -82,6 +82,10 @@ const wss = new WebSocket.Server({server});
     ws.on('message', (message) => {
       redisClientPublisher.publish(`room:${roomId}`, message.toString('utf-8'));
   });
+
+  ws.on('error', (error) => {
+    console.error('WebSocketエラー:', error);
+  });
   
     ws.on('close', () => {
       connections.delete(ws);
